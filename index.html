@@ -433,8 +433,7 @@
       </div>
     </div>
     <div class="product-feed" id="product-feed">
-      <!-- Rendered by JS -->
-    </div>
+      </div>
   </div>
   
   <div id="product-view">
@@ -443,8 +442,7 @@
       <div style="font-weight: bold;">Details</div>
     </div>
     <div id="detail-content">
-      <!-- Rendered by JS -->
-    </div>
+      </div>
   </div>
   
   <div id="overlay-bg" onclick="closeCheckout()"></div>
@@ -462,6 +460,7 @@
 </div>
 
 <script>
+  // FIX: Added './' to force relative routing on GitHub Pages
   const products = [
     {
       id: 'trash1',
@@ -469,7 +468,7 @@
       status: 'Recalled - Terrified of labels, leaves you on Delivered',
       price: 'Unavailable',
       isTrash: true,
-      image: 'situationship.jpg',
+      image: './situationship.jpg',
       details: ['Leaves you on delivered for 16 hours.', 'Says "I’m not looking for anything serious right now" after 6 months.', 'Gaslights you into thinking you are crazy.']
     },
     {
@@ -478,7 +477,7 @@
       status: 'Discontinued - Scrolls FYP during dinner',
       price: 'Unavailable',
       isTrash: true,
-      image: 'tiktok.jpg',
+      image: './tiktok.jpg',
       details: ['Attention span of a goldfish.', 'Communicates entirely in TikTok sounds.', 'Thinks Kai Cenat is a philosopher.']
     },
     {
@@ -487,7 +486,7 @@
       status: 'Bankrupt - Crypto down 85%, makes you split an Uber',
       price: 'Unavailable',
       isTrash: true,
-      image: 'hustle_bro.jpg',
+      image: './hustle_bro.jpg',
       details: ['Wakes up at 4 AM to stare at red charts.', 'Tries to sell you his course on dropshipping.', 'Net worth is currently -$4,000.']
     },
     {
@@ -497,7 +496,7 @@
       price: '1 Daily Forehead Kiss',
       isPrime: true,
       isTrash: false,
-      image: 'mufaddal.jpg',
+      image: './mufaddal.jpg',
       details: [
         '<strong>Compatibility & Synchronization:</strong> Deeply loyal. I come pre-installed with a long-term memory drive specifically allocated for remembering thoughtful gestures and sentimental moments.',
         '<strong>Continuous Upgrades:</strong> Highly invested in self-improvement. I regularly download patches to optimize my physical and mental health (though a few minor bugs are still being worked out).',
@@ -533,7 +532,7 @@
       status: 'Smashed - Punches monitor over Clash Royale',
       price: 'Unavailable',
       isTrash: true,
-      image: 'gamer.jpg',
+      image: './gamer.jpg',
       details: ['Has broken 4 controllers this month.', 'Screams at 12-year-olds online.', 'Hygiene is questionable during double XP weekends.']
     },
     {
@@ -542,7 +541,7 @@
       status: 'Recalled - Zero social calibration',
       price: 'Unavailable',
       isTrash: true,
-      image: 'hug_menace.jpg',
+      image: './hug_menace.jpg',
       details: ['Lingers uncomfortably long in doorways.', 'Comments "heart eyes" on all your old Instagram posts.', 'Thinks a fedora is a personality trait.']
     },
     {
@@ -551,7 +550,7 @@
       status: 'Muted - Threatens to start a podcast',
       price: 'Unavailable',
       isTrash: true,
-      image: 'yapper.jpg',
+      image: './yapper.jpg',
       details: ['Will not let you get a word in edgewise.', 'Has a 3-hour monologue about Joe Rogan.', 'Interrupts you to play devil’s advocate.']
     },
     {
@@ -560,7 +559,7 @@
       status: 'Lost in Transit - Spot is a dimly lit parking lot',
       price: 'Unavailable',
       isTrash: true,
-      image: 'know_a_spot.jpg',
+      image: './know_a_spot.jpg',
       details: ['The spot is always a 45-minute drive away.', 'The spot has no seating and smells like weed.', 'Forgets his wallet at the spot.']
     }
   ];
