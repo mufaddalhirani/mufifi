@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Amazon - Mufaddal Premium Boyfriend</title>
+<style>
+  :root {
+    --amz-dark: #232f3e;
+    --amz-light: #37475a;
+    --amz-yellow: #ffd814;
+    --amz-orange: #ffa41c;
+    --amz-bg: #eaeded;
+    --text-main: #0f1111;
+    --text-muted: #565959;
+    --link-blue: #007185;
+    --amz-green: #067d62;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--amz-bg);
+    color: var(--text-main);
+    overscroll-behavior-y: none;
+    overflow-x: hidden;
+  }
+  
+  /* Amazon UI */
+  #amazon-app {
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease;
+    transform-origin: center center;
+    min-height: 100vh;
+    background: var(--amz-bg);
+    position: relative;
+    z-index: 2;
+  }
+  
+  #feed-view {
+    z-index: 10;
+    padding-bottom: 50px;
+  }
+  
+  .nav-bar {
+    background: var(--amz-dark);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .search-bar {
+    flex: 1;
+    background: white;
+    border-radius: 4px;
+    display: flex;
+    overflow: hidden;
+    height: 40px;
+  }
+  .search-bar input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+  }
+  .search-btn {
+    background: #febd69;
+    border: none;
+    padding: 0 15px;
+    font-size: 18px;
+  }
+  
+  .product-feed {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .product-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .product-card:active {
+    background: #f7f7f7;
+  }
+  .product-img {
+    width: 120px;
+    height: 120px;
+    background: #f0f0f0;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .product-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .product-title { font-size: 15px; font-weight: 400; line-height: 1.4; margin-bottom: 4px; color: var(--link-blue); }
+  .product-status { font-size: 12px; color: #B12704; font-weight: bold; margin-bottom: 4px; }
+  
+  .trash-product {
+    opacity: 0.6;
+    filter: grayscale(80%);
+  }
+  
+  .premium-product {
+    border: 1px solid #ddd;
+    flex-direction: column;
+  }
+  .premium-product .product-img {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+  }
+  .amz-choice {
+    background: var(--amz-dark);
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+    align-self: flex-start;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+  }
+  .amz-choice span { color: var(--amz-orange); }
+  .price { font-size: 28px; font-weight: 400; margin: 8px 0; }
+  .price-symbol { font-size: 14px; vertical-align: top; position: relative; top: 4px; }
+  .prime-logo { color: #00a8e1; font-weight: bold; font-style: italic; font-size: 16px; margin-left: 5px; }
+  .warning { color: #B12704; font-size: 13px; font-weight: bold; margin-bottom: 15px; }
+  
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 100px;
+    border: none;
+    font-size: 15px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .btn-yellow { background: var(--amz-yellow); }
+  .btn-orange { background: var(--amz-orange); }
+  
+  /* Product Detail View */
+  #product-view {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: white;
+    z-index: 15;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .detail-nav {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    z-index: 10;
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+    color: var(--text-main);
+  }
+  .detail-img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+    background: #f8f8f8;
+  }
+  .detail-info {
+    padding: 15px;
+  }
+  .detail-title {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #0f1111;
+    margin-bottom: 8px;
+  }
+  .detail-section {
+    border-top: 4px solid #f0f2f2;
+    padding-top: 15px;
+    margin-top: 15px;
+  }
+  .detail-section h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .detail-specs {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #0f1111;
+    padding-left: 20px;
+  }
+  .detail-specs li {
+    margin-bottom: 12px;
+  }
+  
+  /* Reviews Section */
+  .review-item {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  .review-stars {
+    color: #ffa41c;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  .review-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .review-author {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .review-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Overlay */
+  #overlay-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  #bottom-sheet {
+    position: fixed;
+    bottom: -100%;
+    left: 0; right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    z-index: 21;
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+  }
+  .sheet-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+  .sheet-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; text-align: center; }
+  
+  .canvas-container {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background: #f9f9f9;
+    margin-bottom: 15px;
+    touch-action: none;
+  }
+  canvas { width: 100%; height: 150px; display: block; }
+  
+  /* Order Confirmation Layer */
+  #order-confirmation {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: white;
+    z-index: 25;
+    display: none;
+    opacity: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+  }
+  .check-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid var(--amz-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .check-circle::after {
+    content: "✓";
+    font-size: 40px;
+    color: var(--amz-green);
+    font-weight: bold;
+  }
+  
+  /* Reveal Layer */
+  #reveal-layer {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff0f3;
+    z-index: 30;
+    display: none;
+    opacity: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    transition: opacity 1.5s ease;
+  }
+  .reveal-text {
+    font-size: 32px;
+    font-weight: bold;
+    color: #d81b60;
+    margin-bottom: 10px;
+    font-family: "Georgia", serif;
+    line-height: 1.2;
+  }
+  .reveal-subtext {
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 40px;
+  }
+  .action-btns {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  .btn-yes, .btn-no {
+    position: absolute;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .btn-yes {
+    background: #ff4081;
+    color: white;
+    left: 50%;
+    top: 20px;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .btn-no {
+    background: white;
+    color: #ff4081;
+    left: 50%;
+    top: 100px;
+    transform: translateX(-50%);
+    transition: top 0.15s linear, left 0.15s linear;
+  }
+  
+  .btn-no::after {
+    content: "🦵🦵";
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    opacity: 1;
+    display: none;
+  }
+  .btn-no.running::after {
+    display: block;
+    animation: run 0.15s infinite alternate;
+  }
+  @keyframes run {
+    0% { transform: translateX(-60%) rotate(-15deg); }
+    100% { transform: translateX(-40%) rotate(15deg); }
+  }
+  
+  #celebration {
+    display: none;
+    font-size: 36px;
+    font-weight: bold;
+    color: #d81b60;
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div id="order-confirmation">
+  <div class="check-circle"></div>
+  <h2 style="color: var(--amz-green); margin-bottom: 10px;">Order placed, thank you!</h2>
+  <p style="color: var(--text-muted); margin-bottom: 30px;">Confirmation will be sent to your heart shortly.</p>
+  <p style="font-size: 14px; color: var(--text-muted);">Processing transaction details...</p>
+</div>
+
+<div id="reveal-layer">
+  <div id="question-container">
+    <div class="reveal-text">Will you be my girlfriend?</div>
+    <div class="reveal-subtext">Transaction Approved. Final step required.</div>
+    <div class="action-btns">
+      <button class="btn-yes" onclick="accept()">Yes</button>
+      <button class="btn-no" id="btn-no">No</button>
+    </div>
+  </div>
+  <div id="celebration">
+    🎉 Order Confirmed! 🎉<br>
+    <span style="font-size: 18px; color: #555; display: block; margin-top: 15px;">Estimated Delivery: Right Now.</span>
+  </div>
+</div>
+
+<div id="amazon-app">
+  <div id="feed-view">
+    <div class="nav-bar">
+      <div class="search-bar">
+        <input type="text" value="mufaddal premium boyfriend" readonly>
+        <button class="search-btn">🔍</button>
+      </div>
+    </div>
+    <div class="product-feed" id="product-feed">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+  
+  <div id="product-view">
+    <div class="detail-nav">
+      <button class="back-btn" onclick="closeProduct()">←</button>
+      <div style="font-weight: bold;">Details</div>
+    </div>
+    <div id="detail-content">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+  
+  <div id="overlay-bg" onclick="closeCheckout()"></div>
+  <div id="bottom-sheet">
+    <div class="sheet-title">Final Agreement</div>
+    <div class="sheet-desc">You are purchasing a non-refundable lifetime contract for maximum affection. Please sign below to confirm.</div>
+    
+    <div class="canvas-container">
+      <canvas id="signature-pad"></canvas>
+    </div>
+    
+    <button class="btn btn-orange" onclick="confirmSignature()">Confirm Signature & Buy</button>
+    <button class="btn" style="background: #e3e6e6; margin-top: 10px;" onclick="clearSignature()">Clear Signature</button>
+  </div>
+</div>
+
+<script>
+  const products = [
+    {
+      id: 'trash1',
+      title: 'The Situationship Final Boss',
+      status: 'Recalled - Terrified of labels, leaves you on Delivered',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'situationship.jpg',
+      details: ['Leaves you on delivered for 16 hours.', 'Says "I’m not looking for anything serious right now" after 6 months.', 'Gaslights you into thinking you are crazy.']
+    },
+    {
+      id: 'trash2',
+      title: 'The Brainrot / TikTok Addict',
+      status: 'Discontinued - Scrolls FYP during dinner',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'tiktok.jpg',
+      details: ['Attention span of a goldfish.', 'Communicates entirely in TikTok sounds.', 'Thinks Kai Cenat is a philosopher.']
+    },
+    {
+      id: 'trash3',
+      title: 'The Delusional Hustle Bro',
+      status: 'Bankrupt - Crypto down 85%, makes you split an Uber',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'hustle_bro.jpg',
+      details: ['Wakes up at 4 AM to stare at red charts.', 'Tries to sell you his course on dropshipping.', 'Net worth is currently -$4,000.']
+    },
+    {
+      id: 'mufaddal',
+      title: 'The Mufaddal (Premium 1-of-1 Edition) Fully Optimized',
+      status: 'In Stock',
+      price: '1 Daily Forehead Kiss',
+      isPrime: true,
+      isTrash: false,
+      image: 'mufaddal.jpg',
+      details: [
+        '<strong>Compatibility & Synchronization:</strong> Deeply loyal. I come pre-installed with a long-term memory drive specifically allocated for remembering thoughtful gestures and sentimental moments.',
+        '<strong>Continuous Upgrades:</strong> Highly invested in self-improvement. I regularly download patches to optimize my physical and mental health (though a few minor bugs are still being worked out).',
+        '<strong>Co-op Exploration Module:</strong> Adventurous and goal-oriented. I’m fully equipped for shared milestones and travel. Warning: I may aggressively optimize the itinerary.',
+        '<strong>Independent Power Source:</strong> Fiercely self-reliant. I don’t require constant recharging from a partner to function, though I will gladly accept compliments as premium fuel.',
+        '<strong>Aesthetic & Immersion Drive:</strong> Deeply perceptive. I will occasionally pause operations to appreciate the profound beauty of a cinematic soundtrack, a well-designed outfit, or a really nice piece of nature.'
+      ],
+      warning: '⚠️ Warning: Violently refuses to let you pay the bill.',
+      reviews: [
+        {
+          rating: '⭐️⭐️⭐️⭐️',
+          title: 'Solid build, but uninstalled the traditional software.',
+          author: 'Family Member',
+          text: 'Really proud of how this unit is running. We had to do an early uninstall of the "Traditional College Diploma" package, but the "Hustle & Independence" module that replaced it is working flawlessly. The loyalty circuits are top-notch—still proudly wears the clothes I gift it. Sometimes gets stuck in an infinite loop optimizing its diet, but overall, a very reliable model.'
+        },
+        {
+          rating: '⭐️⭐️⭐️⭐️⭐️',
+          title: 'Great co-op partner, but the avatar customization takes forever.',
+          author: 'Gaming Friend',
+          text: 'Excellent response time in strategic tower defense matches. Highly competitive. My only complaint is that ever since the recent "High Fashion & Modeling" patch dropped, this unit spends way too much time checking its own stats and mirror reflections. Still, 10/10 would team up with again.'
+        },
+        {
+          rating: '⭐️⭐️⭐️⭐️½',
+          title: 'The ultimate travel and fitness companion.',
+          author: 'Gym/Travel Buddy',
+          text: 'This model’s energy efficiency is off the charts. The built-in itinerary generator for the upcoming mountain expedition is incredibly detailed, and the physical conditioning settings are running at max capacity. I’m only docking half a star because trying to get this unit to consume un-optimized junk food on a rest day is nearly impossible now.'
+        }
+      ]
+    },
+    {
+      id: 'trash4',
+      title: 'The Rage-Quitting Gamer',
+      status: 'Smashed - Punches monitor over Clash Royale',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'gamer.jpg',
+      details: ['Has broken 4 controllers this month.', 'Screams at 12-year-olds online.', 'Hygiene is questionable during double XP weekends.']
+    },
+    {
+      id: 'trash5',
+      title: 'The "Where’s My Hug?" Menace',
+      status: 'Recalled - Zero social calibration',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'hug_menace.jpg',
+      details: ['Lingers uncomfortably long in doorways.', 'Comments "heart eyes" on all your old Instagram posts.', 'Thinks a fedora is a personality trait.']
+    },
+    {
+      id: 'trash6',
+      title: 'The Professional Yapper',
+      status: 'Muted - Threatens to start a podcast',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'yapper.jpg',
+      details: ['Will not let you get a word in edgewise.', 'Has a 3-hour monologue about Joe Rogan.', 'Interrupts you to play devil’s advocate.']
+    },
+    {
+      id: 'trash7',
+      title: 'The "I Know a Spot" Guy',
+      status: 'Lost in Transit - Spot is a dimly lit parking lot',
+      price: 'Unavailable',
+      isTrash: true,
+      image: 'know_a_spot.jpg',
+      details: ['The spot is always a 45-minute drive away.', 'The spot has no seating and smells like weed.', 'Forgets his wallet at the spot.']
+    }
+  ];
+
+  function renderFeed() {
+    const feed = document.getElementById('product-feed');
+    feed.innerHTML = products.map(p => `
+      <div class="product-card ${p.isTrash ? 'trash-product' : 'premium-product'}" onclick="openProduct('${p.id}')">
+        <img src="${p.image}" class="product-img" alt="${p.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ddd%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2214%22 text-anchor=%22middle%22 alignment-baseline=%22middle%22>Image</text></svg>'">
+        <div class="product-info">
+          <div class="product-title" style="${p.isPrime ? 'font-size: 16px; font-weight: 500; color: #0f1111;' : ''}">${p.title}</div>
+          ${p.isTrash ? '<div class="product-status">' + p.status + '</div>' : ''}
+          <div class="price">${p.price} ${p.isPrime ? '<span class="prime-logo">✓ prime</span>' : ''}</div>
+          ${p.isPrime ? `
+            <div class="warning">${p.warning}</div>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    
+    const detailContent = document.getElementById('detail-content');
+    let detailsHtml = p.details.map(d => '<li>' + d + '</li>').join('');
+    
+    let reviewsHtml = '';
+    if (p.reviews) {
+      reviewsHtml = `
+        <div class="detail-section">
+          <h3>Customer Reviews</h3>
+          ${p.reviews.map(r => `
+            <div class="review-item">
+              <div class="review-stars">${r.rating}</div>
+              <div class="review-title">${r.title}</div>
+              <div class="review-author">Reviewed by ${r.author}</div>
+              <div class="review-text">"${r.text}"</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    detailContent.innerHTML = `
+      <img src="${p.image}" class="detail-img" alt="${p.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ddd%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2214%22 text-anchor=%22middle%22 alignment-baseline=%22middle%22>Image</text></svg>'">
+      <div class="detail-info">
+        ${p.isPrime ? '<div class="amz-choice" style="margin-top: 10px;">Amazon’s <span>Choice</span></div>' : ''}
+        <div class="detail-title" style="${p.isPrime ? 'font-weight: bold;' : ''}">${p.title}</div>
+        ${p.isTrash ? '<div class="product-status" style="font-size: 14px; margin-bottom: 10px;">' + p.status + '</div>' : ''}
+        <div class="price" style="font-size: 32px;">${p.price} ${p.isPrime ? '<span class="prime-logo">✓ prime</span>' : ''}</div>
+        
+        ${p.isPrime ? `
+          <div class="warning" style="font-size: 14px; margin: 15px 0;">${p.warning}</div>
+          <button class="btn btn-yellow" style="margin-bottom: 10px;">Add to Cart</button>
+          <button class="btn btn-orange" onclick="openCheckout()">Buy Now</button>
+        ` : `
+          <button class="btn" style="background: #e3e6e6; color: #888; cursor: not-allowed; margin-bottom: 15px;">Currently Unavailable</button>
+          <div style="font-size: 14px; color: #565959; margin-bottom: 15px;">We don't know when or if this item will be back in stock. (Hopefully never).</div>
+        `}
+        
+        <div class="detail-section">
+          <h3>About this item</h3>
+          <ul class="specs detail-specs">
+            ${detailsHtml}
+          </ul>
+        </div>
+        
+        ${reviewsHtml}
+      </div>
+    `;
+    
+    document.getElementById('product-view').style.transform = 'translateX(0)';
+    window.scrollTo(0, 0);
+  }
+
+  function closeProduct() {
+    document.getElementById('product-view').style.transform = 'translateX(100%)';
+  }
+
+  // Initialize
+  renderFeed();
+
+  // Canvas logic
+  const canvas = document.getElementById('signature-pad');
+  const ctx = canvas.getContext('2d');
+  let isDrawing = false;
+  let hasDrawn = false;
+  
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = 150;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+  }
+  window.addEventListener('resize', resizeCanvas);
+  
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  }
+  
+  function startDraw(e) {
+    e.preventDefault();
+    isDrawing = true;
+    hasDrawn = true;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+  
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+  
+  function endDraw(e) {
+    e.preventDefault();
+    isDrawing = false;
+  }
+  
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseout', endDraw);
+  
+  canvas.addEventListener('touchstart', startDraw, {passive: false});
+  canvas.addEventListener('touchmove', draw, {passive: false});
+  canvas.addEventListener('touchend', endDraw, {passive: false});
+  canvas.addEventListener('touchcancel', endDraw, {passive: false});
+  
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn = false;
+  }
+  
+  // Overlay logic
+  const overlayBg = document.getElementById('overlay-bg');
+  const bottomSheet = document.getElementById('bottom-sheet');
+  const amazonApp = document.getElementById('amazon-app');
+  const orderConfirmation = document.getElementById('order-confirmation');
+  const revealLayer = document.getElementById('reveal-layer');
+  
+  function openCheckout() {
+    overlayBg.style.opacity = '1';
+    overlayBg.style.pointerEvents = 'auto';
+    bottomSheet.style.bottom = '0';
+    resizeCanvas();
+  }
+  
+  function closeCheckout() {
+    overlayBg.style.opacity = '0';
+    overlayBg.style.pointerEvents = 'none';
+    bottomSheet.style.bottom = '-100%';
+  }
+  
+  function confirmSignature() {
+    if (!hasDrawn) {
+      alert("Please sign the agreement first!");
+      return;
+    }
+    
+    closeCheckout();
+    
+    // Show Order Confirmation First
+    orderConfirmation.style.display = 'flex';
+    void orderConfirmation.offsetWidth; // trigger reflow
+    orderConfirmation.style.opacity = '1';
+    
+    // Hide Amazon App behind it
+    setTimeout(() => {
+      amazonApp.style.display = 'none';
+    }, 500);
+    
+    // After 3 seconds, transition to the Reveal Layer
+    setTimeout(() => {
+      revealLayer.style.display = 'flex';
+      void revealLayer.offsetWidth; // trigger reflow
+      revealLayer.style.opacity = '1';
+      
+      orderConfirmation.style.opacity = '0';
+      setTimeout(() => {
+        orderConfirmation.style.display = 'none';
+      }, 500);
+    }, 3000);
+  }
+  
+  // No Button Logic
+  const btnNo = document.getElementById('btn-no');
+  const actionBtns = document.querySelector('.action-btns');
+  let noAttempts = 0;
+  let isGone = false;
+  
+  function moveNoButton(e) {
+    if(e) e.preventDefault();
+    if(isGone) return;
+    
+    noAttempts++;
+    btnNo.classList.add('running');
+    
+    const containerRect = actionBtns.getBoundingClientRect();
+    const btnRect = btnNo.getBoundingClientRect();
+    
+    const maxX = containerRect.width - btnRect.width;
+    const maxY = containerRect.height - btnRect.height;
+    
+    const randomX = Math.max(0, Math.floor(Math.random() * maxX));
+    const randomY = Math.max(0, Math.floor(Math.random() * maxY));
+    
+    btnNo.style.left = randomX + 'px';
+    btnNo.style.top = randomY + 'px';
+    btnNo.style.transform = 'none';
+    
+    // Change text based on attempts
+    if (noAttempts === 2) {
+      btnNo.innerText = "Are you sure?";
+    } else if (noAttempts === 4) {
+      btnNo.innerText = "Think about it!";
+    } else if (noAttempts === 6) {
+      btnNo.innerText = "Stop clicking me!";
+    } else if (noAttempts === 8) {
+      btnNo.innerText = "Just click YES!";
+    } else if (noAttempts === 10) {
+      btnNo.innerText = "No 🦵";
+    } else if (noAttempts >= 12) {
+      isGone = true;
+      btnNo.innerText = "fuck this shit i am out";
+      btnNo.style.transition = "all 1s ease-in-out";
+      
+      // Animation to run off the screen and disappear
+      setTimeout(() => {
+        btnNo.style.left = '200%';
+        btnNo.style.opacity = '0';
+      }, 500);
+      
+      setTimeout(() => {
+        btnNo.style.display = 'none';
+      }, 1500);
+    }
+  }
+  
+  btnNo.addEventListener('mouseover', moveNoButton);
+  btnNo.addEventListener('touchstart', moveNoButton, {passive: false});
+  btnNo.addEventListener('click', moveNoButton);
+  
+  function accept() {
+    document.getElementById('question-container').style.display = 'none';
+    document.getElementById('celebration').style.display = 'block';
+  }
+</script>
+</body>
+</html>
